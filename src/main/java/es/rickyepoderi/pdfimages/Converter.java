@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 ricky <https://github.com/rickyepoderi/pdfimages>
+ * Copyright (c) 2017 ricky <https://github.com/rickyepoderi/pdfimages>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -177,20 +177,16 @@ public class Converter {
     public void parseImages2Pdf(String[] args) throws IOException {
         List<File> files = new ArrayList<>();
         for (int i = 0; i < args.length - 1; i++) {
-            try {
-                File f = new File(args[i]);
-                if (!f.canRead()) {
-                    usage(String.format("File \"%s\" is not readable.", args[i]));
-                }
-                String mime = Files.probeContentType(f.toPath());
-                Iterator<ImageReader> iter = ImageIO.getImageReadersByMIMEType(mime);
-                if (iter == null || !iter.hasNext()) {
-                    usage(String.format("Cannot find image reader for file \"%s\".", args[i]));
-                }
-                files.add(f);
-            } catch (IOException e) {
-                usage(String.format("IOException parsing image file \"%s\".", args[i]));
+            File f = new File(args[i]);
+            if (!f.canRead()) {
+                usage(String.format("File \"%s\" is not readable.", args[i]));
             }
+            String mime = Files.probeContentType(f.toPath());
+            Iterator<ImageReader> iter = ImageIO.getImageReadersByMIMEType(mime);
+            if (iter == null || !iter.hasNext()) {
+                usage(String.format("Cannot find image reader for file \"%s\".", args[i]));
+            }
+            files.add(f);
         }
         if (files.isEmpty()) {
             usage("You should provide one or more images to add to the pdf file.");
