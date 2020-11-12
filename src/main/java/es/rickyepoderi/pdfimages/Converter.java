@@ -46,7 +46,7 @@ import org.apache.pdfbox.rendering.PDFRenderer;
  * <ul>
  * <li><strong>images2Pdf</strong>: it receives an array of images and creates
  * a pdf with one image in each page.</li>
- * <li><string>pdf2Images</strong>: it receives the pdf file and creates one
+ * <li><strong>pdf2Images</strong>: it receives the pdf file and creates one
  * image per page.</li>
  * </ul>
  * 
@@ -61,6 +61,9 @@ import org.apache.pdfbox.rendering.PDFRenderer;
  */
 public class Converter {
     
+    public static final String DEFAULT_FORMAT = "jpg";
+    public static final ImageType DEFAULT_TYPE = ImageType.RGB;
+
     /**
      * Empty constructor
      */
@@ -95,7 +98,7 @@ public class Converter {
      * path specified.
      *
      * @param output The file to write
-     * @param bimages The buffered images to put in the pdf
+     * @param files The image files to put in the pdf
      * @throws IOException Some error generating the PDF
      */
     public void images2Pdf(File output, File... files) throws IOException {
@@ -120,7 +123,7 @@ public class Converter {
      * 
      * @param pdfFile The PDF file to read
      * @param prefix The prefix of the images to write
-     * @param imgFormat The image format ("jpg", "png",...) used by ImageIO
+     * @param suffix The image suffix used for image files ("jpg", "png",...)
      * @param dpi The DPI of the images to render pages
      * @param type The type of the image (RGB, GREY,...)
      * @throws IOException Some error generating the images
@@ -150,21 +153,21 @@ public class Converter {
                 .append("Error: ").append(error).append(nl).append(nl)
                 .append("USAGE:").append(nl).append(nl);
         // pdf2images
-        sb.append("java -cp pdfimages.jar pdf2images [options] file.pdf [image-prefix]").append(nl)
+        sb.append("java -jar pdfimages.jar pdf2images [options] file.pdf [image-prefix]").append(nl)
                 .append("  Transforms the pdf in a series of images one per page.").append(nl)
                 .append("  Options:").append(nl)
                 .append("  --dpi -d dpi: DPIs of the image to produce (default 150)").append(nl)
-                .append("  --format -f format: format of the image supported by ImageIO (default \"jpg\")").append(nl);
+                .append("  --format -f format: format of the image supported by ImageIO.").append(nl);
         for (String format: ImageIO.getWriterFileSuffixes()) {
-            sb.append("    * ").append(format).append(nl);
+            sb.append("    * ").append(format).append(DEFAULT_FORMAT.equals(format)? " (default)" : "").append(nl);
         }
         sb.append("  --type -t type: ImageType to produce.").append(nl);
         for (ImageType type: ImageType.values()) {
-            sb.append("    * ").append(type).append(nl);
+            sb.append("    * ").append(type).append(type == DEFAULT_TYPE? " (default)" : ""). append(nl);
         }
         // images2pdf
         sb.append(nl)
-                .append("java -cp pdfimages.jar images2pdf image1 image2 ... file.pdf").append(nl)
+                .append("java -jar pdfimages.jar images2pdf image1 image2 ... file.pdf").append(nl)
                 .append("  Converts the images in a PDF file, one image per page.").append(nl);
         throw new IllegalArgumentException(sb.toString());
     } 
@@ -272,9 +275,9 @@ public class Converter {
      */
     public void parsePdf2Images(String[] args) throws IOException {
         int dpi = 150;
-        String format = "jpg";
+        String format = DEFAULT_FORMAT;
         boolean options = true;
-        ImageType type = ImageType.RGB;
+        ImageType type = DEFAULT_TYPE;
         int i;
         for (i = 0; i < args.length && options; i++) {
             switch(args[i]) {
